@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LOS SANTOS HEIST — Ограбление склада</title>
+<style>
+  :root{
+    --accent:#ffb020;
+    --danger:#ff3b30;
+    --good:#3ddc84;
+    --panel:rgba(8,10,14,.72);
+    --stroke:rgba(255,255,255,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:#05070b;
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#fff;
+    -webkit-font-smoothing:antialiased;user-select:none}
+  #game{position:fixed;inset:0}
+  canvas{display:block}
+
+  /* ---------------- HUD ---------------- */
+  #hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+  .hidden{display:none !important}
+
+  /* health */
+  #vitals{position:absolute;left:22px;top:20px;width:250px}
+  .bar{height:13px;border:1px solid var(--stroke);background:rgba(0,0,0,.5);
+    border-radius:2px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.55)}
+  .bar > i{display:block;height:100%;width:100%;transition:width .12s linear}
+  #healthFill{background:linear-gradient(90deg,#3ddc84,#9dff6e)}
+  #armorFill{background:linear-gradient(90deg,#49a7ff,#9cd4ff)}
+  #armorBar{margin-top:4px;height:7px}
+  .label{font-size:10px;letter-spacing:2.5px;opacity:.75;margin-bottom:5px;
+    text-transform:uppercase;text-shadow:0 2px 6px #000}
+
+  /* wanted stars */
+  #wanted{position:absolute;right:22px;top:18px;display:flex;gap:4px}
+  .star{width:26px;height:26px;opacity:.18;filter:drop-shadow(0 2px 4px #000);transition:opacity .2s}
+  .star.on{opacity:1}
+  .star.blink{animation:blink .7s steps(2) infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  /* weapon / ammo */
+  #weapon{position:absolute;right:22px;bottom:22px;text-align:right;
+    text-shadow:0 3px 12px #000}
+  #weaponName{font-size:12px;letter-spacing:3px;opacity:.8;text-transform:uppercase}
+  #ammo{font-size:34px;font-weight:700;line-height:1}
+  #ammo small{font-size:16px;opacity:.65;font-weight:500}
+  #reloading{color:var(--accent);font-size:12px;letter-spacing:2px;height:14px}
+
+  /* minimap */
+  #minimapWrap{position:absolute;left:22px;bottom:22px;width:196px;height:196px;
+    border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.25);
+    box-shadow:0 6px 24px rgba(0,0,0,.6);background:#10161f}
+  #minimap{width:196px;height:196px;display:block}
+  #speedo{position:absolute;left:22px;bottom:228px;width:196px;text-align:center;
+    text-shadow:0 3px 10px #000}
+  #speedVal{font-size:30px;font-weight:700;line-height:1}
+  #speedVal small{font-size:12px;opacity:.6;letter-spacing:2px}
+  #gearBar{height:5px;margin-top:5px;background:rgba(0,0,0,.5);border-radius:3px;overflow:hidden}
+  #gearFill{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffb020,#ff5b3a)}
+
+  /* objective */
+  #objective{position:absolute;left:50%;top:18px;transform:translateX(-50%);
+    text-align:center;max-width:60%}
+  #objTitle{font-size:11px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;
+    text-shadow:0 2px 8px #000}
+  #objText{font-size:19px;font-weight:600;margin-top:3px;text-shadow:0 3px 12px #000}
+  #objDist{font-size:12px;opacity:.7;margin-top:2px;letter-spacing:1px}
+
+  /* gps arrow */
+  #gps{position:absolute;left:50%;top:50%;width:0;height:0}
+  #gpsArrow{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;
+    transform-origin:50% 50%;opacity:.9;filter:drop-shadow(0 2px 6px #000)}
+
+  /* crosshair */
+  #cross{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;
+    opacity:.9}
+  #cross div{position:absolute;background:#fff;box-shadow:0 0 3px #000}
+  #cross .h{left:0;right:0;top:12px;height:1.5px}
+  #cross .v{top:0;bottom:0;left:12px;width:1.5px}
+  #cross.hit div{background:var(--danger)}
+
+  /* notifications */
+  #toasts{position:absolute;left:22px;bottom:240px;
+    display:flex;flex-direction:column-reverse;gap:7px;align-items:flex-start;width:min(420px,45vw)}
+  .toast{background:var(--panel);border-left:3px solid var(--accent);padding:9px 16px;
+    font-size:14px;border-radius:3px;backdrop-filter:blur(6px);
+    box-shadow:0 6px 20px rgba(0,0,0,.5);animation:slide .35s ease-out}
+  .toast.good{border-color:var(--good)}
+  .toast.bad{border-color:var(--danger)}
+  @keyframes slide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+
+  /* hit / damage feedback */
+  #damage{position:absolute;inset:0;pointer-events:none;opacity:0;
+    background:radial-gradient(ellipse at center,rgba(255,0,0,0) 35%,rgba(160,0,0,.75) 100%);
+    transition:opacity .25s}
+
+  #hint{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);
+    background:var(--panel);border:1px solid var(--stroke);border-radius:4px;
+    padding:8px 16px;font-size:14px;letter-spacing:.4px}
+  #hint b{color:var(--accent)}
+
+  /* ---------------- Screens ---------------- */
+  .screen{position:fixed;inset:0;z-index:20;display:flex;align-items:center;
+    justify-content:center;background:radial-gradient(ellipse at 50% 40%,#12161d 0%,#04060a 75%);
+    pointer-events:auto;overflow:auto;padding:18px}
+  .card{width:min(760px,92vw);max-height:calc(100vh - 36px);overflow:auto;
+    padding:clamp(20px,4vw,38px) clamp(18px,4vw,44px);background:rgba(10,13,18,.92);
+    border:1px solid var(--stroke);border-radius:8px;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+  .kicker{font-size:11px;letter-spacing:6px;color:var(--accent);text-transform:uppercase}
+  h1{margin:8px 0 4px;font-size:clamp(28px,5vw,44px);letter-spacing:-1px;line-height:1.05}
+  h1.fail{color:var(--danger)}
+  h1.win{color:var(--good)}
+  .sub{opacity:.75;font-size:15px;line-height:1.55;margin-bottom:22px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 26px;margin:18px 0 24px}
+  .row{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(255,255,255,.12);
+    padding:6px 0;font-size:14px}
+  .row span:last-child{color:var(--accent);font-weight:600}
+  .keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:16px 0 26px}
+  .key{display:flex;align-items:center;gap:9px;font-size:13px;opacity:.9;line-height:1.5}
+  kbd{background:#1b2029;border:1px solid #2f3742;border-bottom-width:2px;border-radius:4px;
+    padding:2px 8px;font-family:inherit;font-size:12px;min-width:26px;text-align:center;display:inline-block}
+  button{pointer-events:auto;background:var(--accent);color:#111;border:0;border-radius:4px;
+    padding:13px 30px;font-size:15px;font-weight:700;letter-spacing:1.5px;cursor:pointer;
+    text-transform:uppercase;transition:transform .1s,filter .1s}
+  button:hover{filter:brightness(1.1)}
+  button:active{transform:translateY(1px)}
+  button.ghost{background:transparent;color:#fff;border:1px solid var(--stroke);margin-left:10px}
+  #loading{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;background:#04060a;gap:18px}
+  #loading .bar{width:280px}
+  #loadFill{background:var(--accent);width:5%}
+  .small{font-size:12px;opacity:.55;letter-spacing:1px}
+</style>
+</head>
+<body>
+<div id="game"></div>
+
+<!-- ============================ HUD ============================ -->
+<div id="hud" class="hidden">
+  <div id="vitals">
+    <div class="label">Здоровье</div>
+    <div class="bar"><i id="healthFill"></i></div>
+    <div class="bar" id="armorBar"><i id="armorFill"></i></div>
+  </div>
+
+  <div id="wanted"></div>
+
+  <div id="objective">
+    <div id="objTitle">Задание</div>
+    <div id="objText">—</div>
+    <div id="objDist"></div>
+  </div>
+
+  <div id="gps"><svg id="gpsArrow" viewBox="0 0 40 40"><path d="M20 2 L33 34 L20 26 L7 34 Z" fill="#ffb020" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+
+  <div id="cross"><div class="h"></div><div class="v"></div></div>
+
+  <div id="minimapWrap"><canvas id="minimap" width="392" height="392"></canvas></div>
+  <div id="speedo" class="hidden">
+    <div id="speedVal">0<small> КМ/Ч</small></div>
+    <div id="gearBar"><i id="gearFill"></i></div>
+  </div>
+
+  <div id="weapon">
+    <div id="weaponName">Карабин</div>
+    <div id="ammo">30<small>/150</small></div>
+    <div id="reloading"></div>
+  </div>
+
+  <div id="toasts"></div>
+  <div id="hint" class="hidden"></div>
+  <div id="damage"></div>
+</div>
+
+<!-- ============================ Screens ============================ -->
+<div id="loading">
+  <div class="kicker">LOS SANTOS HEIST</div>
+  <div class="bar"><i id="loadFill"></i></div>
+  <div class="small" id="loadText">Строим город…</div>
+</div>
+
+<div id="briefing" class="screen hidden">
+  <div class="card">
+    <div class="kicker">Миссия 01 · Промзона Элизиан</div>
+    <h1>Ограбление склада</h1>
+    <div class="sub">
+      Заказчик ждёт кейс с прототипом. Груз лежит на складе в промзоне —
+      охрана частная, значит, шуметь можно.<br><br>
+      <b>1.</b> Садись в машину и гони к складу на юго-востоке.<br>
+      <b>2.</b> Зачисти двор и ангар — пятеро охранников.<br>
+      <b>3.</b> Забери кейс внутри ангара.<br>
+      <b>4.</b> Полиция приедет быстро. Отрывайся и гони к точке эвакуации в порту на северо-западе.
+    </div>
+    <div class="keys">
+      <div class="key"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Движение / руль</div>
+      <div class="key"><kbd>Мышь</kbd> Камера и прицел</div>
+      <div class="key"><kbd>Shift</kbd> Бег / ускорение</div>
+      <div class="key"><kbd>Space</kbd> Прыжок / ручник</div>
+      <div class="key"><kbd>ЛКМ</kbd> Огонь</div>
+      <div class="key"><kbd>ПКМ</kbd> Прицеливание</div>
+      <div class="key"><kbd>E</kbd> Сесть / выйти из машины</div>
+      <div class="key"><kbd>R</kbd> Перезарядка</div>
+      <div class="key"><kbd>P</kbd> Пауза · <kbd>M</kbd> Звук · <kbd>H</kbd> Помощь</div>
+    </div>
+    <button id="startBtn">Начать миссию</button>
+    <span class="small" style="margin-left:14px">Нажмите Enter</span>
+  </div>
+</div>
+
+<div id="endScreen" class="screen hidden">
+  <div class="card">
+    <div class="kicker" id="endKicker">Результат</div>
+    <h1 id="endTitle">Миссия пройдена</h1>
+    <div class="sub" id="endSub"></div>
+    <div class="grid" id="endStats"></div>
+    <button id="restartBtn">Рестарт</button>
+    <button id="menuBtn" class="ghost">Брифинг</button>
+  </div>
+</div>
+
+<div id="pauseScreen" class="screen hidden">
+  <div class="card">
+    <div class="kicker">Пауза</div>
+    <h1>Перекур</h1>
+    <div class="keys">
+      <div class="key"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Движение / руль</div>
+      <div class="key"><kbd>Мышь</kbd> Камера и прицел</div>
+      <div class="key"><kbd>Shift</kbd> Бег / ускорение</div>
+      <div class="key"><kbd>Space</kbd> Прыжок / ручник</div>
+      <div class="key"><kbd>ЛКМ</kbd> Огонь · <kbd>ПКМ</kbd> Прицел</div>
+      <div class="key"><kbd>E</kbd> В машину / из машины</div>
+      <div class="key"><kbd>R</kbd> Перезарядка</div>
+      <div class="key"><kbd>M</kbd> Звук вкл/выкл</div>
+    </div>
+    <button id="resumeBtn">Продолжить</button>
+    <button id="abortBtn" class="ghost">Начать заново</button>
+  </div>
+</div>
+
+<!-- ============================ Engine ============================ -->
+<script src="vendor/three/three.min.js"></script>
+<script src="vendor/three/shaders/CopyShader.js"></script>
+<script src="vendor/three/shaders/LuminosityHighPassShader.js"></script>
+<script src="vendor/three/shaders/FXAAShader.js"></script>
+<script src="vendor/three/postprocessing/EffectComposer.js"></script>
+<script src="vendor/three/postprocessing/RenderPass.js"></script>
+<script src="vendor/three/postprocessing/ShaderPass.js"></script>
+<script src="vendor/three/postprocessing/UnrealBloomPass.js"></script>
+
+<!-- ============================ Game ============================ -->
+<script src="src/core.js"></script>
+<script src="src/fx.js"></script>
+<script src="src/world.js"></script>
+<script src="src/character.js"></script>
+<script src="src/player.js"></script>
+<script src="src/vehicle.js"></script>
+<script src="src/npc.js"></script>
+<script src="src/hud.js"></script>
+<script src="src/mission.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
