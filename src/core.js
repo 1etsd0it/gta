@@ -60,8 +60,11 @@
       window.addEventListener('keyup', (e) => { this.keys[e.code] = false; });
       window.addEventListener('blur', () => { this.keys = Object.create(null); this.mouse.left = this.mouse.right = false; });
 
+      // Работает и с pointer lock, и без него (например, внутри iframe,
+      // где браузер может не дать захватить курсор): тогда камера крутится,
+      // пока зажата кнопка мыши.
       dom.addEventListener('mousedown', (e) => {
-        if (!this.locked) return;
+        if (!this.enabled) return;
         if (e.button === 0) { this.mouse.left = true; this.mouse.leftEdge = true; }
         if (e.button === 2) this.mouse.right = true;
       });
@@ -71,7 +74,7 @@
       });
       window.addEventListener('contextmenu', (e) => e.preventDefault());
       document.addEventListener('mousemove', (e) => {
-        if (!this.locked) return;
+        if (!this.locked && !this.mouse.left && !this.mouse.right) return;
         this.mouse.dx += e.movementX || 0;
         this.mouse.dy += e.movementY || 0;
       });
@@ -79,11 +82,16 @@
         this.locked = document.pointerLockElement === dom;
         if (GTA.game) GTA.game.onPointerLock(this.locked);
       });
+      document.addEventListener('pointerlockerror', () => { this.lockBlocked = true; });
       dom.addEventListener('click', () => { if (this.enabled) this.requestLock(); });
     },
 
     requestLock() {
-      if (this._dom && !this.locked && this._dom.requestPointerLock) this._dom.requestPointerLock();
+      if (this.lockBlocked || this.locked) return;
+      if (this._dom && this._dom.requestPointerLock) {
+        const r = this._dom.requestPointerLock();
+        if (r && r.catch) r.catch(() => { this.lockBlocked = true; });
+      }
     },
     releaseLock() {
       if (document.exitPointerLock && this.locked) document.exitPointerLock();
