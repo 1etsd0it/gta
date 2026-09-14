@@ -139,7 +139,7 @@ select{background:#14171d;color:var(--bone);border:1px solid var(--edge);padding
 
 /* -------------------------------- toast ----------------------------------- */
 #toast{
-  position:fixed;left:50%;bottom:13vh;transform:translateX(-50%);z-index:15;
+  position:fixed;left:50%;bottom:21vh;transform:translateX(-50%);z-index:15;
   font-family:var(--title);font-size:clamp(18px,2vw,26px);letter-spacing:.22em;
   text-transform:uppercase;color:#fff;padding:10px 26px;pointer-events:none;
   background:rgba(8,8,11,.72);border-left:3px solid var(--rust);

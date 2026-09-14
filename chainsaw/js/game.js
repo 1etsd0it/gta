@@ -110,6 +110,16 @@
     }
 
     /* ============================ lifecycle ============================= */
+    /* A slow pan over the street sits behind the menu instead of black. */
+    ensureMenuScene() {
+      if (this.menuLevel) return;
+      this.menuLevel = new CR.Level(this);
+      this.menuCam = new CR.Camera(this.W, this.H);
+      this.menuCam.reset(5200, CR.GROUND - 330);
+      this.menuCam.targetZoom = 1.06;
+      this.menuCam.zoom = 1.06;
+    }
+
     toMenu() {
       this.state = 'menu';
       this.audio.stopMusic();
@@ -160,7 +170,6 @@
          harder ruleset so it stays functional rather than dead. */
       this.ui.toast('LEVEL 02 — DOWNTOWN: COMING SOON', 2.4);
       this.startLevel();
-      this.hardMode = true;
     }
 
     setPaused(v) {
@@ -460,6 +469,16 @@
         this.tickWorld(dt * .4);
         return;
       }
+      if (this.state === 'menu') {
+        this.ensureMenuScene();
+        this.menuCam.W = this.W; this.menuCam.H = this.H;
+        this.menuCam.cx += 26 * dt;               /* drift down the street */
+        this.menuCam.update(dt, false);
+        CR.Particles.update(dt);
+        this.fx.update(dt);
+        this.ui.update(dt);
+        return;
+      }
       if (this.state !== 'play' && this.state !== 'dying') { this.ui.update(dt); return; }
 
       /* slow motion */
@@ -615,9 +634,23 @@
         this.level.drawProps(ctx, cam, true);
         this.level.drawLampLight(ctx, cam, this.quality);
         this.level.drawForeground(ctx, cam);
+      } else if (this.menuLevel) {
+        const mc = this.menuCam;
+        ctx.restore();
+        ctx.save();
+        mc.apply(ctx);
+        this.menuLevel.drawSky(ctx, mc);
+        this.menuLevel.drawBackground(ctx, mc);
+        for (const b of this.menuLevel.buildings) b.draw(ctx, mc);
+        this.menuLevel.drawGround(ctx, mc);
+        this.menuLevel.drawProps(ctx, mc, false);
+        this.menuLevel.drawProps(ctx, mc, true);
+        this.menuLevel.drawLampLight(ctx, mc, this.quality);
+        this.menuLevel.drawForeground(ctx, mc);
       } else {
+        const v = cam.view();
         ctx.fillStyle = '#07070a';
-        ctx.fillRect(cam.view().left, cam.view().top, this.W, this.H);
+        ctx.fillRect(v.left, v.top, v.right - v.left, v.bottom - v.top);
       }
       ctx.restore();
 
