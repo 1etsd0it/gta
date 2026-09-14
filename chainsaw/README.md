@@ -1,117 +1,135 @@
-# CHAINSAW RAMPAGE — мультяшный gore-раннер
+# CHAINSAW RAMPAGE — Level 01: Suburbs
 
-2D-раннер на чистом HTML5 Canvas: маньяк в хоккейной маске бежит по городской улице
-слева направо, режет бензопилой прохожих, отстреливается от полиции и взрывает дома.
-Стилистика — пиксель-арт в духе Hotline Miami / Postal: кислотные цвета, мясные
-частицы, комиксовые надписи «SPLAT!» и «BOOM!». Насилие подчёркнуто гротескное и
-несерьёзное.
+A cinematic 2D side-scrolling action runner built on HTML5 Canvas. You play a
+chainsaw-headed killer sprinting through a suburban street at dawn: cut through
+whatever is in front of you, shoot what isn't, and blow the block apart.
 
-Ни сборщиков, ни зависимостей, ни внешних CDN: **весь арт и весь звук генерируются кодом**.
+Everything — the character, the street, the cars, the sky, every sound — is
+generated procedurally in code. There are no image files, no audio files, no
+libraries and no build step.
 
 ```
-# просто откройте файл в браузере:
+# just open it
 xdg-open chainsaw/index.html      # Linux
 open chainsaw/index.html          # macOS
 start chainsaw/index.html         # Windows
 ```
 
-Если браузер блокирует локальные файлы — поднимите любой статический сервер:
-`python3 -m http.server 8000` и откройте `http://localhost:8000/chainsaw/`.
+If the browser blocks local files, serve the folder:
+`python3 -m http.server 8000`, then open `http://localhost:8000/chainsaw/`.
 
 ---
 
-## Управление
+## Controls
 
-| Клавиша | Действие |
+| Input | Action |
 |---|---|
-| `Space` / `↑` | Прыжок (короткое нажатие — низкий прыжок) |
-| `↓` | Подкат: проходит под пулями, бьёт пилой понизу |
-| `ЛКМ` / `Z` | Удар бензопилой — ближний бой, широкая дуга |
-| `ПКМ` / `X` | Выстрел из пистолета — дальний бой, патроны ограничены |
-| `E` | Заложить взрывчатку в зоне у дома |
-| `←` `→` | Подвинуться по улице (на арене — полноценное перемещение) |
-| `P` / `Esc` | Пауза |
-| `M` | Звук вкл/выкл |
-| `Enter` | Старт / рестарт / следующий уровень |
+| `SPACE` / `↑` / `W` | Jump (hold for height, tap for a short hop) |
+| `↓` / `S` | Slide — ducks under gunfire, cuts low |
+| `Z` / **Left mouse** | Chainsaw attack |
+| `X` / **Right mouse** | Pistol |
+| `E` | Plant explosive in a marked zone |
+| `←` `→` / `A` `D` | Shift position while running; free movement in locked fights |
+| `P` / `ESC` | Pause |
+| `M` | Mute |
+| `ENTER` | Start / retry / next level |
 
-## Как играть
+Right-click is captured by the canvas, so the browser menu never appears.
 
-Улица скроллится сама и постепенно ускоряется. Задача — доехать до финального двора,
-зачистить волны полиции и взорвать штаб-квартиру.
+## The run
 
-* **Прохожие** гибнут от одного удара пилой, но сначала разбегаются с криками.
-* **Полицейские** стреляют в ответ: два удара пилой или один выстрел.
-* **Собаки** бегут низко и кусают — прыжок или подкат с пилой.
-* **Машины** на пути: перепрыгнуть, расстрелять или подорвать взрывом.
-* **Мини-боссы** в бронежилетах палят из дробовика веером, у них своя полоска HP.
+The street scrolls itself; he runs whether you like it or not. The level moves
+through scripted beats: a quiet dawn street, the first police response, the
+chase, tactical units, a mini-boss, a locked arena, and the precinct.
 
-Дом с вывеской «ПОД СНОС» и заколоченными окнами — цель. Встань в пунктирную зону с
-канистрами, нажми `E`, и через пару секунд взрыв снесёт здание вместе со всеми, кто
-оказался рядом. Стоять рядом самому не стоит.
+* **Chainsaw** — the primary weapon. One hit kills a civilian, two drop a cop,
+  armour takes more. Every swing burns fuel; on an empty tank swings are slower
+  and much weaker, so keep picking up gasoline.
+* **Pistol** — fast and accurate at range, weak against armour, and the
+  magazine is finite. Best used on police before they close.
+* **Explosives** — orange spray-painted zones outside condemned houses. Stand in
+  one, press `E`, then get clear: the charge takes out the building, everything
+  near it, and scores every body caught in the blast.
+* **Combo** — kills chain while the timer runs. The multiplier climbs to x3 and
+  the screen starts to come apart at `CHAIN x10`.
 
-### Подбираемое
+### The cast
 
-| Предмет | Эффект |
-|---|---|
-| Ящик патронов | +6 патронов (максимум 30) |
-| Канистра бензина | +55 к «заряду» пилы: без бензина замах вдвое медленнее и слабее |
-| Динамит | +1 заряд взрывчатки |
-| Аптечка | +35 здоровья |
+| Enemy | Behaviour | Score |
+|---|---|---|
+| Civilians (5 variants) | Panic and run when you get close | 50 |
+| Police | Close to firing range and shoot back | 100 |
+| Dogs | Fast, low, bite on contact — jump or cut them | 75 |
+| Armoured units | Shrug off bullets, fire three-round bursts | 150 |
+| **THE ENFORCER** | Shotgun, charge and melee — punish him after a charge | 500 |
 
-### Очки
+The boss telegraphs his charge and is left winded afterwards: that recovery
+window takes 60% extra damage and is the intended way to kill him.
 
-| Событие | Очки |
-|---|---|
-| Убийство бензопилой | 50 |
-| Убийство из пистолета | 30 |
-| Убийство взрывом | 40 |
-| Полицейский | +10 сверху |
-| Мини-босс | 300 |
-| Взрыв дома | 200 + 25 за каждого убитого в радиусе |
-| Бонус за здоровье в конце уровня | HP × 5 |
+### Pickups
 
-Серия убийств без пауз копит комбо: каждые 4 убийства поднимают множитель (до `x8`),
-пауза 2.6 секунды или полученный урон его сбрасывают.
+Ammo (+12), gasoline (+60 fuel), medkit (+45 health), explosive charge (+1).
 
-## Уровни
+### Rank
 
-1. **Пригород** — рассвет, заборы, три дома под снос, один дорожный мини-босс.
-2. **Деловой центр** — закат и неон, копов заметно больше.
-3. **Промзона** — ночь, максимальная скорость, спецназ и два босса в волне.
-
-Каждый уровень заканчивается финальной ареной: камера останавливается, из-за
-баррикад идут волны полиции, а в глубине двора стоит штаб. Уровень засчитан, когда
-двор зачищен **и** штаб взорван. Дальше — экран статистики резни и кнопка
-«Следующий уровень».
+The results screen scores the run on total points, best combo, buildings
+levelled, body count and how much health you finished with, from **D** to **S+**.
 
 ---
 
-## Как это устроено
+## How it is built
 
-| Файл | Содержимое |
-|---|---|
-| `src/core.js` | утилиты, клавиатура/мышь, камера с тряской и вспышками |
-| `src/audio.js` | синтез звука на Web Audio: луп пилы, выстрелы, крики, взрывы, synthwave-секвенсор |
-| `src/art.js` | «конструктор человечка» и генерация всех спрайт-листов в offscreen-канвасы |
-| `src/fx.js` | пулы частиц (мясо, кровь, обломки, дым, огонь), лужи и комиксовые надписи |
-| `src/world.js` | параллакс-фон, дорога, заборы, фонари; три цветовые темы |
-| `src/entities.js` | игрок, враги, пули, бонусы, машины, дома со взрывом |
-| `src/level.js` | генерация маршрута, столкновения, очки и комбо, финальная арена |
-| `src/hud.js` | интерфейс поверх сцены |
-| `src/main.js` | канвас, масштабирование, цикл с фиксированным шагом, экраны |
+```
+chainsaw/
+  index.html      screens, HUD containers, script order
+  style.css       dark cinematic UI
+  js/
+    collision.js  math helpers, AABB/segment/circle tests
+    assets.js     procedural art: sky, skyline, trees, houses, props, vehicles
+    rig.js        the character system + pose library
+    particles.js  pooled particles and ground decals
+    postfx.js     bloom, grain, vignette, colour grade, chromatic aberration
+    camera.js     follow, trauma shake, zoom, lock
+    audio.js      Web Audio synthesis: chainsaw, guns, screams, score
+    weapons.js    bullets, muzzle flashes, the explosion routine
+    player.js     the protagonist: movement, weapons, damage, death
+    enemies.js    civilians, police, dogs, armour, boss, cars, pickups
+    level.js      Level 01 layout, parallax rendering, destructible buildings
+    ui.js         HUD, banners, floating numbers, menus, results
+    game.js       orchestration: input, entities, beats, waves, scoring
+    main.js       boot, resize, main loop, adaptive quality
+```
 
-Несколько решений, которые стоит знать при доработке:
+A few decisions worth knowing before changing anything:
 
-* **Спрайты рисуются кодом.** `Art.sheet(name, w, h, n, fn)` рендерит `n` кадров в одну
-  ленту; кадры человечков собираются из одного тела с разными палитрами, головными
-  уборами и оружием. Логика игры дёргает `Art.draw(...)` / `Art.drawFlash(...)`.
-* **Логика идёт фиксированным шагом 1/60** в `Game.frame`, поэтому поведение не зависит
-  от частоты кадров, а отрисовка — по каждому кадру rAF.
-* **Частицы живут в пулах** фиксированного размера (600 частиц, 28 надписей, 140 луж) —
-  в игровом цикле нет аллокаций.
-* **Координаты сущностей**: `x` — центр, `y` — «под ногами». Экранная координата —
-  `x - camera.x`; боксы столкновений отдаёт метод `box()`.
-* **Порядок отрисовки** важен: корпуса домов рисуются до земли, а зоны закладки — после,
-  иначе тротуар накрывает пунктирную разметку.
-* **Звук стартует только по жесту пользователя** (политика браузеров): `Sound.init()`
-  вызывается на первом клике или нажатии клавиши.
+* **The character is one rig.** Body parts are pre-rendered once into offscreen
+  canvases at 2x and composed per frame with transforms, so the protagonist is
+  literally the same pixels in every animation — run, slide, attack and death
+  can never drift apart. Civilians, police, SWAT and the boss are the same
+  skeleton with different outfits, which is why the whole cast is lit alike.
+  His chainsaw head, arm bars and spinning chain teeth are his own parts.
+* **Poses, not frames.** `CR.Poses` returns joint angles; actors blend toward
+  them. Locomotion blends smoothly, attacks and hits snap.
+* **Nothing is loaded.** `assets.js` draws every house, tree, car and prop into
+  canvases at boot (a few hundred milliseconds), so the frame loop only ever
+  does `drawImage`.
+* **The world is drawn straight to the visible canvas** and post-processed in
+  place; bloom is computed at 1/5 resolution. Frame rate is watched, and quality
+  steps down automatically if the budget is missed.
+* **Coordinates**: ground is world `y = 0`, up is negative, `x` grows to the
+  right. An actor's `y` is the point under its feet.
+* **Audio** is synthesised on the fly and only starts after a user gesture, per
+  browser autoplay rules. The chainsaw is a continuous oscillator stack whose
+  pitch and filter track how hard you are revving it.
+
+### Level 02
+
+`NEXT LEVEL` is wired up and functional: it reports that Downtown is coming and
+restarts the slice. The level script lives in `level.js → buildScript()` as a
+list of spawns and beats, so a second level is a new script plus a palette.
+
+## Content note
+
+Cartoon-grade but heavy violence: blood, dismemberment particles and demolished
+buildings. Gore can be turned off in **Settings → Blood & Gore**, which replaces
+the red with dust.

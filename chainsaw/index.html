@@ -1,185 +1,144 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CHAINSAW RAMPAGE — Пригород</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%AA%93%3C/text%3E%3C/svg%3E">
-<style>
-  :root{
-    --blood:#ff2f45;
-    --gore:#c4232a;
-    --neon:#ff8a2b;
-    --acid:#9dff6e;
-    --gold:#ffe14c;
-    --panel:rgba(12,8,18,.86);
-    --stroke:rgba(255,255,255,.16);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;overflow:hidden;background:#07060c;color:#fff;
-    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;user-select:none;
-    -webkit-font-smoothing:antialiased}
-  #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-    background:
-      radial-gradient(circle at 50% 20%,#2a1040 0%,#120a1c 55%,#07060c 100%)}
-  canvas{display:block;image-rendering:pixelated;box-shadow:0 0 0 2px rgba(255,255,255,.08),
-    0 30px 90px rgba(0,0,0,.8), 0 0 90px rgba(255,47,69,.12)}
-
-  /* ------------------------------ экраны ------------------------------ */
-  #screens{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-    z-index:10;padding:16px;overflow:auto}
-  #screens::before{content:"";position:fixed;inset:0;background:rgba(6,4,10,.72);
-    backdrop-filter:blur(3px)}
-  .hidden{display:none !important}
-
-  .card{position:relative;width:min(760px,96vw);background:var(--panel);
-    border:2px solid var(--stroke);border-radius:14px;padding:26px 30px 24px;
-    box-shadow:0 26px 80px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.08)}
-  .card::after{content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;
-    box-shadow:inset 0 0 90px rgba(255,47,69,.12)}
-  .kicker{font-size:12px;letter-spacing:5px;text-transform:uppercase;color:var(--neon);
-    margin-bottom:8px;font-weight:700}
-  h1{font-family:Impact,"Arial Black",system-ui,sans-serif;font-size:clamp(34px,6.4vw,62px);
-    line-height:.95;margin:0 0 6px;letter-spacing:1px;
-    background:linear-gradient(180deg,#fff 0%,#ffd7a0 45%,#ff2f45 100%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    filter:drop-shadow(0 4px 0 rgba(0,0,0,.5))}
-  h2{font-family:Impact,"Arial Black",system-ui,sans-serif;font-size:clamp(26px,4.2vw,40px);
-    margin:0 0 6px;letter-spacing:1px;color:var(--gold)}
-  .sub{opacity:.82;font-size:15px;line-height:1.5;margin-bottom:18px;max-width:60ch}
-
-  .keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:8px 18px;
-    margin:16px 0 20px}
-  .key{display:flex;align-items:center;gap:9px;font-size:13.5px;opacity:.92}
-  kbd{display:inline-block;min-width:26px;text-align:center;padding:3px 7px;border-radius:6px;
-    background:#1c1730;border:1px solid rgba(255,255,255,.2);border-bottom-width:3px;
-    font:600 12px/1 "Segoe UI",sans-serif;color:#fff}
-
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:4px 26px;
-    margin:6px 0 20px}
-  .row{display:flex;justify-content:space-between;gap:14px;padding:7px 2px;
-    border-bottom:1px dashed rgba(255,255,255,.12);font-size:14px}
-  .row b{color:var(--gold);font-variant-numeric:tabular-nums}
-  .row:last-child b{color:var(--acid)}
-
-  .btns{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-  button{font-family:Impact,"Arial Black",system-ui,sans-serif;letter-spacing:1.5px;
-    font-size:19px;padding:13px 26px;border-radius:10px;cursor:pointer;color:#fff;
-    background:linear-gradient(180deg,#ff4d5e,#a3121f);border:0;border-bottom:4px solid #6d0a14;
-    text-transform:uppercase;transition:transform .08s ease, filter .15s ease}
-  button:hover{filter:brightness(1.12)}
-  button:active{transform:translateY(2px);border-bottom-width:2px}
-  button.ghost{background:linear-gradient(180deg,#39304f,#221b33);border-bottom-color:#15101f}
-  .hint{font-size:12.5px;opacity:.6;margin-top:14px;letter-spacing:.4px}
-  .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;letter-spacing:2px;
-    background:rgba(255,47,69,.16);border:1px solid rgba(255,47,69,.45);color:#ff9daa;
-    text-transform:uppercase;margin-left:8px;vertical-align:middle}
-</style>
+<title>CHAINSAW RAMPAGE — Level 01: Suburbs</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0c'/%3E%3Crect x='4' y='13' width='24' height='6' fill='%23e2691f'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="stage">
-  <canvas id="game" width="960" height="540"></canvas>
+  <canvas id="view"></canvas>
+
+  <!-- ======================= CINEMATIC OVERLAYS ======================= -->
+  <div id="bars"><i></i><i></i></div>
+
+  <!-- ============================ MAIN MENU =========================== -->
+  <section class="screen" id="menu">
+    <div class="menu-inner">
+      <h1 class="logo">CHAINSAW<span>RAMPAGE</span></h1>
+      <p class="tagline">Run. Cut. Destroy. Repeat.</p>
+      <nav class="menu-list">
+        <button class="mbtn" data-action="play">PLAY</button>
+        <button class="mbtn" data-action="howto">HOW TO PLAY</button>
+        <button class="mbtn" data-action="settings">SETTINGS</button>
+      </nav>
+      <div class="menu-foot">LEVEL 01 — SUBURBS · 06:47 AM</div>
+    </div>
+  </section>
+
+  <!-- ============================ HOW TO PLAY ========================= -->
+  <section class="screen hidden" id="howto">
+    <div class="panel">
+      <h2>HOW TO PLAY</h2>
+      <div class="ctrl-grid">
+        <div><kbd>SPACE</kbd><kbd>↑</kbd><span>Jump</span></div>
+        <div><kbd>↓</kbd><span>Slide under fire</span></div>
+        <div><kbd>Z</kbd><kbd>LMB</kbd><span>Chainsaw attack</span></div>
+        <div><kbd>X</kbd><kbd>RMB</kbd><span>Pistol</span></div>
+        <div><kbd>E</kbd><span>Plant explosive in marked zones</span></div>
+        <div><kbd>←</kbd><kbd>→</kbd><span>Shift position / fight in arena</span></div>
+        <div><kbd>P</kbd><kbd>ESC</kbd><span>Pause</span></div>
+        <div><kbd>M</kbd><span>Mute</span></div>
+      </div>
+      <div class="tips">
+        <p><b>Chainsaw</b> — one hit on civilians, two on police, more on armor. Fuel drains with every
+           swing; empty fuel means slow, weak swings. Gasoline cans refill it.</p>
+        <p><b>Pistol</b> — drops police in one shot at range but is weak against armor. Ammo is limited.</p>
+        <p><b>Explosives</b> — orange-marked zones by condemned houses. Plant, run, watch the block go up.
+           Everything caught in the blast counts.</p>
+        <p><b>Combo</b> — kills chain while the timer holds. Higher chains multiply every point you score.</p>
+      </div>
+      <button class="mbtn back" data-action="back">BACK</button>
+    </div>
+  </section>
+
+  <!-- ============================= SETTINGS =========================== -->
+  <section class="screen hidden" id="settings">
+    <div class="panel">
+      <h2>SETTINGS</h2>
+      <label class="row"><span>MASTER VOLUME</span>
+        <input type="range" id="setVolume" min="0" max="100" value="80"><b id="volVal">80</b></label>
+      <label class="row"><span>MUSIC VOLUME</span>
+        <input type="range" id="setMusic" min="0" max="100" value="55"><b id="musVal">55</b></label>
+      <label class="row"><span>VISUAL QUALITY</span>
+        <select id="setQuality">
+          <option value="high" selected>HIGH — bloom, grain, full particles</option>
+          <option value="medium">MEDIUM — reduced post-processing</option>
+          <option value="low">LOW — performance mode</option>
+        </select></label>
+      <label class="row"><span>CAMERA SHAKE</span>
+        <input type="range" id="setShake" min="0" max="150" value="100"><b id="shakeVal">100</b></label>
+      <label class="row"><span>BLOOD &amp; GORE</span>
+        <select id="setGore">
+          <option value="1" selected>ON — stylized</option>
+          <option value="0">OFF</option>
+        </select></label>
+      <button class="mbtn back" data-action="back">BACK</button>
+    </div>
+  </section>
+
+  <!-- ============================== PAUSE ============================= -->
+  <section class="screen hidden" id="pause">
+    <div class="panel narrow">
+      <h2>PAUSED</h2>
+      <button class="mbtn" data-action="resume">RESUME</button>
+      <button class="mbtn ghost" data-action="restart">RESTART LEVEL</button>
+      <button class="mbtn ghost" data-action="menu">MAIN MENU</button>
+    </div>
+  </section>
+
+  <!-- ============================ GAME OVER =========================== -->
+  <section class="screen hidden" id="gameover">
+    <div class="panel narrow">
+      <h2 class="dead">YOU DIED</h2>
+      <div class="sub" id="deathSub">The block wins this round.</div>
+      <div class="stats" id="deathStats"></div>
+      <button class="mbtn" data-action="restart">RETRY</button>
+      <button class="mbtn ghost" data-action="menu">MAIN MENU</button>
+    </div>
+  </section>
+
+  <!-- ========================== LEVEL COMPLETE ======================== -->
+  <section class="screen hidden" id="results">
+    <div class="panel wide">
+      <div class="kicker">LEVEL 01 — SUBURBS</div>
+      <h2>LEVEL COMPLETE</h2>
+      <div class="result-body">
+        <div class="stats" id="resultStats"></div>
+        <div class="rank-box">
+          <div class="rank-label">RANK</div>
+          <div class="rank" id="rankLetter">S</div>
+          <div class="rank-score" id="rankScore">0</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="mbtn" data-action="next">NEXT LEVEL</button>
+        <button class="mbtn ghost" data-action="restart">REPLAY</button>
+        <button class="mbtn ghost" data-action="menu">MAIN MENU</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== TOAST / HINT ========================= -->
+  <div id="toast" class="hidden"></div>
 </div>
 
-<div id="screens">
-
-  <!-- ============================ ТИТУЛЬНЫЙ ============================ -->
-  <div class="card" id="screenTitle">
-    <div class="kicker">Мультяшный gore-раннер</div>
-    <h1>CHAINSAW RAMPAGE</h1>
-    <div class="sub">
-      Маньяк в хоккейной маске вышел на утреннюю пробежку по спальному району.
-      Беги вправо, пили всё живое, отстреливайся от копов и закладывай взрывчатку
-      под дома. Насилие здесь — гротескное и комиксовое: брызги, «SPLAT!» и хохот.
-      <span class="tag">18+ мультяшный треш</span>
-    </div>
-    <div class="keys">
-      <div class="key"><kbd>Space</kbd><kbd>↑</kbd> Прыжок</div>
-      <div class="key"><kbd>↓</kbd> Подкат</div>
-      <div class="key"><kbd>ЛКМ</kbd><kbd>Z</kbd> Удар бензопилой</div>
-      <div class="key"><kbd>ПКМ</kbd><kbd>X</kbd> Выстрел из пистолета</div>
-      <div class="key"><kbd>E</kbd> Заложить взрывчатку</div>
-      <div class="key"><kbd>←</kbd><kbd>→</kbd> Подвинуться по улице</div>
-      <div class="key"><kbd>P</kbd><kbd>Esc</kbd> Пауза</div>
-      <div class="key"><kbd>M</kbd> Звук вкл/выкл</div>
-    </div>
-    <div class="btns">
-      <button id="btnStart">Начать бойню</button>
-      <span class="hint">или <kbd>Enter</kbd></span>
-    </div>
-    <div class="hint">
-      Патроны, канистры с бензином, взрывчатка и аптечки валяются прямо на маршруте.
-      Серия убийств без пауз наращивает комбо-множитель очков.
-    </div>
-  </div>
-
-  <!-- ============================== ПАУЗА ============================== -->
-  <div class="card hidden" id="screenPause">
-    <div class="kicker">Перекур</div>
-    <h2>ПАУЗА</h2>
-    <div class="sub">Пила остывает. Соседи в панике. Можно продолжить.</div>
-    <div class="keys">
-      <div class="key"><kbd>Space</kbd><kbd>↑</kbd> Прыжок</div>
-      <div class="key"><kbd>↓</kbd> Подкат</div>
-      <div class="key"><kbd>ЛКМ</kbd><kbd>Z</kbd> Бензопила</div>
-      <div class="key"><kbd>ПКМ</kbd><kbd>X</kbd> Пистолет</div>
-      <div class="key"><kbd>E</kbd> Взрывчатка у дома</div>
-      <div class="key"><kbd>M</kbd> Звук</div>
-    </div>
-    <div class="btns">
-      <button id="btnResume">Продолжить</button>
-      <button id="btnQuit" class="ghost">В главное меню</button>
-    </div>
-  </div>
-
-  <!-- ============================ GAME OVER ============================ -->
-  <div class="card hidden" id="screenOver">
-    <div class="kicker">Маньяк повержен</div>
-    <h2 style="color:var(--blood)">GAME OVER</h2>
-    <div class="sub">Копы всё-таки достали. Пила заглохла в луже крови.</div>
-    <div class="stats" id="overStats"></div>
-    <div class="btns">
-      <button id="btnRetry">Ещё раз</button>
-      <button id="btnRetryMenu" class="ghost">В меню</button>
-      <span class="hint">или <kbd>Enter</kbd></span>
-    </div>
-  </div>
-
-  <!-- ========================= УРОВЕНЬ ПРОЙДЕН ========================= -->
-  <div class="card hidden" id="screenDone">
-    <div class="kicker">Статистика резни</div>
-    <h2 id="doneTitle">УРОВЕНЬ ПРОЙДЕН</h2>
-    <div class="sub" id="doneSub"></div>
-    <div class="stats" id="doneStats"></div>
-    <div class="btns">
-      <button id="btnNext">Следующий уровень</button>
-      <span class="hint">или <kbd>Enter</kbd></span>
-    </div>
-  </div>
-
-  <!-- ============================== ФИНАЛ ============================== -->
-  <div class="card hidden" id="screenWin">
-    <div class="kicker">Город сгорел</div>
-    <h2 style="color:var(--acid)">ИГРА ПРОЙДЕНА</h2>
-    <div class="sub">Все районы зачищены, штабы взорваны. Титры катятся по пепелищу.</div>
-    <div class="stats" id="winStats"></div>
-    <div class="btns">
-      <button id="btnWinMenu">В главное меню</button>
-      <span class="hint">или <kbd>Enter</kbd></span>
-    </div>
-  </div>
-
-</div>
-
-<script src="src/core.js"></script>
-<script src="src/audio.js"></script>
-<script src="src/art.js"></script>
-<script src="src/fx.js"></script>
-<script src="src/world.js"></script>
-<script src="src/entities.js"></script>
-<script src="src/level.js"></script>
-<script src="src/hud.js"></script>
-<script src="src/main.js"></script>
+<script src="js/collision.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/rig.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/postfx.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/player.js"></script>
+<script src="js/enemies.js"></script>
+<script src="js/level.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
